@@ -1,87 +1,82 @@
-# GPIO library
- import wiringpi # Motor status
- STOP   =  0 
-FORWARD   =  1 
-BACKWORD  =  2 
+import RPi.GPIO as GPIO          
+from time import sleep
 
-# Motor channel
- CH1  =  0 
-CH2  =  1 
+in1 = 24
+in2 = 23
+en = 25
+temp1=1
 
-# PIN input/output setting
- OUTPUT  =  1 
-INPUT  =  0 
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(in1,GPIO.OUT)
+GPIO.setup(in2,GPIO.OUT)
+GPIO.setup(en,GPIO.OUT)
+GPIO.output(in1,GPIO.LOW)
+GPIO.output(in2,GPIO.LOW)
+p=GPIO.PWM(en,1000)
+p.start(25)
+print("\n")
+print("The default speed & direction of motor is LOW & Forward.....")
+print("r-run s-stop f-forward b-backward l-low m-medium h-high e-exit")
+print("\n")    
 
-# PIN Setting
- HIGH  =  1 
-LOW  =  0 
+while(1):
 
-
-
-# Actual pin definition #PWM  PIN 
-ENA  =  25 
-ENB  =  30 
-
-# GPIO  PIN 
-IN1  =  24 
-IN2  =  23 
-IN3  =  22 
-IN4  =  21 
-
-
-# Pin setting function def setPinConfig ( EN ,  INA ,  INB ) : 
-    wiringpi . pinMode ( EN ,  OUTPUT ) 
-    wiringpi . pinMode ( INA ,  OUTPUT ) 
-    wiringpi . pinMode( INB ,  OUTPUT ) 
-    wiringpi . softPwmCreate ( EN ,  0 ,  255 ) 
-
-# Motor control function def setMotorContorl ( PWM ,  INA ,  INB , speed , stat ) : 
-    # Motor speed control PWM 
-    wiringpi . softPwmWrite ( PWM , speed ) 
-
-    # forward
-     if stat ==  FORWARD : 
-        wiringpi . digitalWrite( INA ,  HIGH ) 
-        wiringpi . digitalWrite ( INB ,  LOW ) #back 
-    elif stat ==  BACKWORD : 
-        wiringpi . digitalWrite ( INA ,  LOW ) 
-        wiringpi . digitalWrite ( INB ,  HIGH ) 
-        #stop 
-    elif stat ==  STOP : wiringpi . digitalWrite ( INA ,  LOW ) 
-        wiringpi .digitalWrite ( INB ,  LOW ) 
-
-# Wrap the motor control function once more for simple use ( wrapping ) 
-def setMotor ( ch , speed , stat ) : 
-    if ch ==  CH1 : 
-        setMotorContorl ( ENA ,  IN1 ,  IN2 , speed , stat ) 
-    else : 
-        setMotorContorl ( ENB ,  IN3 ,  IN4 , speed , stat) 
-
-# GPIO library configuration wiringpi . wiringPiSetup ( ) 
-
-# Motor pin setting
- setPinConfig ( ENA ,  IN1 ,  IN2 ) 
-setPinConfig ( ENB ,  IN3 ,  IN4 ) 
-
-# control start # forward 150 speed
- setMotor ( CH1 ,  150 ,  FORWARD ) 
-setMotor ( CH2 ,  150 ,  FORWARD ) 
-# 5 seconds Atmospheric wiringpi . delay (5000 ) 
-
-# setMotor ( CH1 , 100 , BACKWORD ) setMotor ( CH2 , 100 , BACKWORD ) 
-wiringpi at 100 speed
- backward . Delay ( 5000 ) 
-
-# back to 250 at a rate
- setMotor ( CH1 , 250 , backword ) setMotor ( CH2 , 250 , backword ) 
-wiringpi . delay ( 5000 )  
+    x=raw_input()
     
-  
+    if x=='r':
+        print("run")
+        if(temp1==1):
+         GPIO.output(in1,GPIO.HIGH)
+         GPIO.output(in2,GPIO.LOW)
+         print("forward")
+         x='z'
+        else:
+         GPIO.output(in1,GPIO.LOW)
+         GPIO.output(in2,GPIO.HIGH)
+         print("backward")
+         x='z'
 
-# Stop
- setMotor ( CH1 ,  150 ,  STOP ) 
-setMotor ( CH2 ,  150 ,  STOP ) 
 
+    elif x=='s':
+        print("stop")
+        GPIO.output(in1,GPIO.LOW)
+        GPIO.output(in2,GPIO.LOW)
+        x='z'
 
+    elif x=='f':
+        print("forward")
+        GPIO.output(in1,GPIO.HIGH)
+        GPIO.output(in2,GPIO.LOW)
+        temp1=1
+        x='z'
 
-# end
+    elif x=='b':
+        print("backward")
+        GPIO.output(in1,GPIO.LOW)
+        GPIO.output(in2,GPIO.HIGH)
+        temp1=0
+        x='z'
+
+    elif x=='l':
+        print("low")
+        p.ChangeDutyCycle(25)
+        x='z'
+
+    elif x=='m':
+        print("medium")
+        p.ChangeDutyCycle(50)
+        x='z'
+
+    elif x=='h':
+        print("high")
+        p.ChangeDutyCycle(75)
+        x='z'
+     
+    
+    elif x=='e':
+        GPIO.cleanup()
+        break
+    
+    else:
+        print("<<<  wrong data  >>>")
+        print("please enter the defined data to continue.....")
